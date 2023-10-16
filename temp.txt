@@ -1,0 +1,5 @@
+[MSSQLServerDatabase]
+Driver		= ODBC Driver 18 for SQL Server
+Description = Connect to my SQL Sever instance
+Trace		= No
+Server		= localhost
