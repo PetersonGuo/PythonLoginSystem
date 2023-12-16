@@ -3,3 +3,5 @@ re
 bcrypt~=4.1.1
 PyMySQL~=1.1.0
 python-dotenv
+pyotp
+pyqrcode

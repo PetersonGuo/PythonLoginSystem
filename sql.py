@@ -13,7 +13,18 @@ def connect():
 def getuser(username):
     conn = connect()
     with conn:
-        sql = "SELECT * FROM `User` WHERE `Username`=%s"
+        sql = "SELECT Username FROM `User` WHERE `Username`=%s"
+        conn.ping()
+        with conn.cursor() as cursor:
+            cursor.execute(sql, username)
+            result = cursor.fetchone()
+    return result
+
+
+def get_encoded_pw(username):
+    conn = connect()
+    with conn:
+        sql = "SELECT Password FROM `User` WHERE `Username`=%s"
         conn.ping()
         with conn.cursor() as cursor:
             cursor.execute(sql, username)
@@ -29,3 +40,24 @@ def insert(username, pwhash):
         with conn.cursor() as cursor:  # Add user
             cursor.execute(sql, (username, pwhash))
             conn.commit()
+
+
+def insert_2fa(username, secret):
+    conn = connect()
+    with conn:
+        sql = "UPDATE `User` SET `2FA_Secret`=%s WHERE `Username`=%s"
+        conn.ping()
+        with conn.cursor() as cursor:
+            cursor.execute(sql, (secret, username))
+            conn.commit()
+
+
+def get_2fa_secret(username):
+    conn = connect()
+    with conn:
+        sql = "SELECT 2FA_Secret FROM `User` WHERE `Username`=%s"
+        conn.ping()
+        with conn.cursor() as cursor:
+            cursor.execute(sql, username)
+            result = cursor.fetchone()
+    return result
