@@ -4,7 +4,11 @@ import re
 
 def username_input(str1):
     print(str1)
-    username = sys.stdin.readline().strip()
+    try:
+        username = sys.stdin.readline().strip()
+    except ValueError:
+        print("Invalid Input")
+        return ""
     if is_valid_username(username):
         return username
     return ""

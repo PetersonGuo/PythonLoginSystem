@@ -33,4 +33,4 @@ def generate_qr_code(username):
 
 def verify_code(secret):
     totp = pyotp.TOTP(secret)
-    return totp.verify(input("Enter the Code : "))
+    return totp.verify(input("Enter the Code: "))
