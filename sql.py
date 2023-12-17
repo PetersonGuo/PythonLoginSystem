@@ -3,30 +3,43 @@ import pymysql.cursors
 
 
 def connect():
-    return pymysql.connect(host=os.getenv('database_host'),
-                           user=os.getenv('database_user'),
-                           password=os.getenv('database_pass'),
-                           database=os.getenv('database_name'),
-                           cursorclass=pymysql.cursors.DictCursor)
+    try:
+        return pymysql.connect(host=os.getenv('database_host'),
+                               user=os.getenv('database_user'),
+                               password=os.getenv('database_pass'),
+                               database=os.getenv('database_name'),
+                               cursorclass=pymysql.cursors.DictCursor,
+                               connect_timeout=1)
+    except pymysql.err.OperationalError:
+        print("Could not connect to database")
+        exit(1)
 
 
 def get_sql(sql, *args):
     conn = connect()
-    with conn:
-        conn.ping()
+    try:
         with conn.cursor() as cursor:
             cursor.execute(sql, *args)
             result = cursor.fetchone()
+    except pymysql.err.OperationalError:
+        print("Could not connect to database")
+        exit(1)
+    finally:
+        conn.close()
     return result
 
 
 def update_sql(sql, *args):
     conn = connect()
-    with conn:
-        conn.ping()
+    try:
         with conn.cursor() as cursor:
             cursor.execute(sql, *args)
             conn.commit()
+    except pymysql.err.OperationalError:
+        print("Could not connect to database")
+        exit(1)
+    finally:
+        conn.close()
 
 
 def get_username(uid):

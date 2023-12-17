@@ -1,7 +1,6 @@
 # To Implement:
 # User Timeout/Brute force prevention
 # Password strength
-# Error catching with SQL
 # frontend and flask
 
 import sys
