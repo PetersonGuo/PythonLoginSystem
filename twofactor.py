@@ -1,13 +1,6 @@
 import pyotp
 import pyqrcode
 import sql
-import user
-
-
-def setup_2fa(uid):
-    secret = generate_qr_code(uid)
-    if secret is not None:
-        sql.insert_2fa(uid, secret)
 
 
 def generate_qr_code(uid):
@@ -30,18 +23,3 @@ def generate_qr_code(uid):
 def verify_code(secret):
     totp = pyotp.TOTP(secret)
     return totp.verify(input("Enter the Code: ").strip().replace(" ", ""))
-
-
-def remove_2fa(uid):
-    print("Are you sure you want to remove 2FA? (y/n)")
-    if user.yes_no_input():
-        if user.__reauthenticate(uid):
-            sql.remove_2fa(uid)
-            print("2FA removed")
-            return True
-    print("2FA not removed")
-    return False
-
-
-def is_2fa_setup(uid):
-    return sql.get_2fa_secret(uid) is not None

@@ -1,6 +1,6 @@
+import create
 import sql
 import bcrypt
-import user
 import getpass
 import twofactor
 
@@ -13,7 +13,7 @@ def check(username, pw):
 
 
 def login():
-    username = user.username_input("Username: ")
+    username = create.username_input("Username: ")
     password = getpass.getpass("Password: ")
     if username != "" and check(username, password.encode('utf-8')):
         uid = sql.get_user_id(username)

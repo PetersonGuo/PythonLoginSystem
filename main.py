@@ -7,7 +7,6 @@ import sys
 import dotenv
 import login
 import create
-import twofactor
 import user
 
 dotenv.load_dotenv()
@@ -18,7 +17,7 @@ def __main__():
     while True:
         if uid is None:
             print('0: Login\n1: Create a new Login')
-        elif twofactor.is_2fa_setup(uid):
+        elif user.is_2fa_setup(uid):
             print('0: Change your username\n1: Change your password\n2: Remove 2FA\n3: Logout\n4: Delete Account')
         else:
             print('0: Change your username\n1: Change your password\n2: Setup 2FA\n3: Logout\n4: Delete Account')
@@ -44,10 +43,10 @@ def __main__():
                 case 1:
                     user.change_password(uid)
                 case 2:
-                    if twofactor.is_2fa_setup(uid):
-                        twofactor.remove_2fa(uid)
+                    if user.is_2fa_setup(uid):
+                        user.remove_2fa(uid)
                     else:
-                        twofactor.setup_2fa(uid)
+                        user.setup_2fa(uid)
                 case 3:
                     print("Logged out\n")
                     uid = None

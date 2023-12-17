@@ -1,49 +1,9 @@
 import getpass
 import sys
-import re
 import create
 import login
 import sql
-
-
-def username_input(str1):
-    print(str1)
-    try:
-        username = sys.stdin.readline().strip()
-    except ValueError:
-        print("Invalid Input")
-        return ""
-    if is_valid_username(username):
-        return username
-    return ""
-
-
-def is_valid_username(str1):
-    if len(str1) < 4:
-        print("Username must be at least 4 characters long")
-        return False
-    elif len(str1) > 20:
-        print("Username must be less than 20 characters long")
-        return False
-    elif re.search(r'[^A-Za-z0-9_.-]', str1):
-        print("Invalid characters in username")
-        return False
-    else:
-        return True
-
-
-def is_valid_password(username, password):
-    if len(password) < 12:
-        print("Password must be at least 12 characters long")
-        return False
-    elif username in password:
-        print("Password cannot contain your username")
-        return False
-    elif re.search(r'[^A-Za-z0-9!@#$%^&*()_+=-]', password):
-        print("Invalid characters in password")
-        return False
-    else:
-        return True
+import twofactor
 
 
 def yes_no_input():
@@ -99,3 +59,24 @@ def __reauthenticate(uid):
     else:
         print("Incorrect Password")
     return False
+
+
+def setup_2fa(uid):
+    secret = twofactor.generate_qr_code(uid)
+    if secret is not None:
+        sql.insert_2fa(uid, secret)
+
+
+def remove_2fa(uid):
+    print("Are you sure you want to remove 2FA? (y/n)")
+    if yes_no_input():
+        if __reauthenticate(uid):
+            sql.remove_2fa(uid)
+            print("2FA removed")
+            return True
+    print("2FA not removed")
+    return False
+
+
+def is_2fa_setup(uid):
+    return sql.get_2fa_secret(uid) is not None
