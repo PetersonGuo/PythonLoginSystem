@@ -6,8 +6,9 @@ import twofactor
 
 
 def check(username, pw):
-    if sql.getuser(username) is not None:
-        return bcrypt.checkpw(pw, sql.get_encoded_pw(username)['Password'].encode())
+    uid = sql.get_user_id(username)
+    if uid is not None:
+        return bcrypt.checkpw(pw, sql.get_encoded_pw(uid).encode())
     return False
 
 
@@ -15,21 +16,22 @@ def login():
     username = user.username_input("Username: ")
     password = getpass.getpass("Password: ")
     if username != "" and check(username, password.encode('utf-8')):
-        if sql.get_2fa_secret(username)['2FA_Secret'] is not None:
-            if not twofactor_loop(username):
+        uid = sql.get_user_id(username)
+        if sql.get_2fa_secret(uid) is not None:
+            if not twofactor_loop(uid):
                 return None
         print("Logged in\n")
-        return username
+        return uid
     else:
         print("Incorrect Username or Password")
         print("Please try again\n")
         return None
 
 
-def twofactor_loop(username):
+def twofactor_loop(uid):
     tries = 0
     while tries < 3:
-        if twofactor.verify_code(sql.get_2fa_secret(username)['2FA_Secret']):
+        if twofactor.verify_code(sql.get_2fa_secret(uid)):
             return True
         print("Incorrect 2FA Code")
         if tries < 2:

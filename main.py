@@ -1,6 +1,5 @@
 # To Implement:
 # User Timeout/Brute force prevention
-# User account control
 # Password strength
 # Error catching with SQL
 # frontend and flask
@@ -10,43 +9,54 @@ import dotenv
 import login
 import create
 import twofactor
+import user
 
 dotenv.load_dotenv()
 
 
 def __main__():
-    user = None
+    uid = None
     while True:
-        print('0: Login\n1: Create a new Login\n2: Change your username\n3: Change your password\n4: Setup 2FA'
-              '\n5: Logout')
+        if uid is None:
+            print('0: Login\n1: Create a new Login')
+        elif twofactor.is_2fa_setup(uid):
+            print('0: Change your username\n1: Change your password\n2: Remove 2FA\n3: Logout\n4: Delete Account')
+        else:
+            print('0: Change your username\n1: Change your password\n2: Setup 2FA\n3: Logout\n4: Delete Account')
+
         try:
             num = int(sys.stdin.readline()[0])
         except ValueError:
             print("Invalid Input")
             continue
 
-        match num:
-            case 0:
-                user = login.login()
-            case 1:
-                create.create()
-            case 2:
-                if user is not None:
-                    print("in progress")
-                else:
-                    print("Please sign in first")
-            case 3:
-                if user is not None:
-                    print("in progress")
-                else:
-                    print("Please sign in first")
-            case 4:
-                twofactor.two_factor_authenticate(user)
-            case 5:
-                user = None
-                print("Logged out\n")
-            case _:
-                print("Invalid Input")
+        if uid is None:
+            match num:
+                case 0:
+                    uid = login.login()
+                case 1:
+                    create.create_account()
+                case _:
+                    print("Invalid Input")
+        else:
+            match num:
+                case 0:
+                    user.change_username(uid)
+                case 1:
+                    user.change_password(uid)
+                case 2:
+                    if twofactor.is_2fa_setup(uid):
+                        twofactor.remove_2fa(uid)
+                    else:
+                        twofactor.setup_2fa(uid)
+                case 3:
+                    print("Logged out\n")
+                    uid = None
+                case 4:
+                    if user.delete_user(uid):
+                        uid = None
+                case _:
+                    print("Invalid Input")
 
 
 __main__()
