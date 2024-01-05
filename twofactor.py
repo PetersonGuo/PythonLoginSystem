@@ -1,13 +1,11 @@
 import pyotp
 import pyqrcode
-import sql
 
 
-def generate_qr_code(uid):
-    username = sql.get_username(uid)
+def generate_qr_code(user):
     secret = pyotp.random_base32()
     auth = pyotp.totp.TOTP(secret).provisioning_uri(
-        name=username,
+        name=user.username,
         issuer_name='Login_System')
     print(pyqrcode.create(auth).terminal(quiet_zone=1))
     print("Scan the QR code with your phone")

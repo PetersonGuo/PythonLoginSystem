@@ -3,6 +3,7 @@
 # Password strength
 # Password reset
 # Email verification
+# frontend
 
 import sys
 import dotenv

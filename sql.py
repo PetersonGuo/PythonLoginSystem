@@ -42,31 +42,31 @@ def update_sql(sql, *args):
         conn.close()
 
 
-def get_username(uid):
-    result = get_sql("SELECT Username FROM `User` WHERE `UID`=%s", uid)
+def get_username(user):
+    result = get_sql("SELECT Username FROM `User` WHERE `UID`=%s", user.uid)
     try:
         return result['Username']
     except TypeError:
         return None
 
 
-def get_encoded_pw(uid):
-    result = get_sql("SELECT Password FROM `User` WHERE `UID`=%s", uid)
+def get_encoded_pw(user):
+    result = get_sql("SELECT Password FROM `User` WHERE `UID`=%s", user.uid)
     try:
         return result['Password']
     except TypeError:
         return None
 
 
-def get_2fa_secret(uid):
-    result = get_sql("SELECT 2FA_Secret FROM `User` WHERE `UID`=%s", uid)
+def get_2fa_secret(user):
+    result = get_sql("SELECT 2FA_Secret FROM `User` WHERE `UID`=%s", user.uid)
     try:
         return result['2FA_Secret']
     except TypeError:
         return None
 
 
-def get_user_id(username):
+def get_user_id(username: str):
     result = get_sql("SELECT UID FROM `User` WHERE `Username`=%s", username)
     try:
         return result['UID']
@@ -74,26 +74,39 @@ def get_user_id(username):
         return None
 
 
-def insert(username, pwhash):
+def insert(username: str, pwhash):
     update_sql("INSERT INTO `User` (Username, Password) VALUES (%s, %s)", (username, pwhash))
     return get_user_id(username)
 
 
-def insert_2fa(uid, secret):
-    update_sql("UPDATE `User` SET `2FA_Secret`=%s WHERE `UID`=%s", (secret, uid))
+def insert_email(username: str, email: str, pwhash):
+    update_sql("INSERT INTO `User` (Username, Email, Password) VALUES (%s, %s, %s)", (username, email, pwhash))
+    return get_user_id(username)
 
 
-def change_username(uid, new_username):
-    update_sql("UPDATE `User` SET `Username`=%s WHERE `UID`=%s", (new_username, uid))
+def insert_2fa(user, secret):
+    update_sql("UPDATE `User` SET `2FA_Secret`=%s WHERE `UID`=%s", (secret, user.uid))
 
 
-def change_password(uid, new_password):
-    update_sql("UPDATE `User` SET `Password`=%s WHERE `UID`=%s", (new_password, uid))
+def change_username(user, new_username: str):
+    update_sql("UPDATE `User` SET `Username`=%s WHERE `UID`=%s", (new_username, user.uid))
 
 
-def delete_user(uid):
-    update_sql("DELETE FROM `User` WHERE `UID`=%s", uid)
+def change_password(user, new_password):
+    update_sql("UPDATE `User` SET `Password`=%s WHERE `UID`=%s", (new_password, user.uid))
 
 
-def remove_2fa(uid):
-    update_sql("UPDATE `User` SET `2FA_Secret`=NULL WHERE `UID`=%s", uid)
+def delete_user(user):
+    update_sql("DELETE FROM `User` WHERE `UID`=%s", user.uid)
+
+
+def remove_2fa(user):
+    update_sql("UPDATE `User` SET `2FA_Secret`=NULL WHERE `UID`=%s", user.uid)
+
+
+def get_email(user):
+    result = get_sql("SELECT Email FROM `User` WHERE `UID`=%s", user.uid)
+    try:
+        return result['Email']
+    except TypeError:
+        return None

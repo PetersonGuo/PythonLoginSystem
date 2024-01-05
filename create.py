@@ -1,6 +1,7 @@
 import re
 import sys
 import user
+import User
 import sql
 import bcrypt
 import getpass
@@ -8,15 +9,16 @@ import getpass
 
 def create_account():
     username = create_username()
-    uid = sql.insert(username, create_password(username))
-    session_user = user.User(uid)
+    email = email_input("Enter your email address: ")
+    uid = sql.insert_email(username, email, create_password(username))
+    session_user = User.User(uid, username, email)
     print("\nWould you like to setup 2FA? (y/n)")
     if user.yes_no_input():
         session_user.setup_2fa()
     print("User created Successfully\n")
 
 
-def username_input(str1):
+def username_input(str1: str):
     print(str1)
     try:
         username = sys.stdin.readline().strip()
@@ -28,7 +30,7 @@ def username_input(str1):
     return ""
 
 
-def is_valid_username(str1):
+def is_valid_username(str1: str):
     if len(str1) < 4:
         print("Username must be at least 4 characters long")
         return False
@@ -40,6 +42,32 @@ def is_valid_username(str1):
         return False
     else:
         return True
+
+
+def is_valid_email(email: str):
+    if len(email) > 254:
+        print("Email must be less than 254 characters long")
+        return False
+    elif re.search(r'[^A-Za-z0-9@._-]', email):
+        print("Invalid characters in email")
+        return False
+    elif not re.search(r'[^@]+@[^@]+\.[^@]+', email):
+        print("Invalid email")
+        return False
+    else:
+        return True
+
+
+def email_input(str1: str):
+    print(str1)
+    try:
+        email = sys.stdin.readline().strip()
+    except ValueError:
+        print("Invalid Input")
+        return ""
+    if is_valid_email(email):
+        return email
+    return ""
 
 
 def create_username():
@@ -54,7 +82,7 @@ def create_username():
     return username
 
 
-def is_valid_password(username, password):
+def is_valid_password(username: str, password):
     if len(password) < 12:
         print("Password must be at least 12 characters long")
         return False
@@ -68,7 +96,7 @@ def is_valid_password(username, password):
         return True
 
 
-def create_password(username):
+def create_password(username: str):
     print(
         "\nDo not use common passwords\nUse Letters, Numbers, and Symbols\nDo not use common "
         "english words in your password\nDo not use your name, username, birthday, or other personal "

@@ -1,38 +1,38 @@
+import os
 import create
 import sql
 import bcrypt
 import getpass
 import twofactor
-from user import User
+import User
+import time
 
 
-def check(username, pw):
-    uid = sql.get_user_id(username)
-    if uid is not None:
-        return bcrypt.checkpw(pw, sql.get_encoded_pw(uid).encode())
-    return False
+def check(user, pw):
+    time.sleep(os.urandom(1)[0] / 1000)
+    return user.uid is not None and bcrypt.checkpw(pw, sql.get_encoded_pw(user).encode())
 
 
 def login():
     username = create.username_input("Username: ")
     password = getpass.getpass("Password: ")
-    if username != "" and check(username, password.encode('utf-8')):
-        uid = sql.get_user_id(username)
-        if sql.get_2fa_secret(uid) is not None:
-            if not twofactor_loop(uid):
+    possible_user = User.User(sql.get_user_id(username), username)
+    if username != "" and check(possible_user, password.encode('utf-8')):
+        if sql.get_2fa_secret(possible_user) is not None:
+            if not twofactor_loop(possible_user):
                 return None
         print("Logged in\n")
-        return User(uid)
+        return possible_user
     else:
         print("Incorrect Username or Password")
         print("Please try again\n")
         return None
 
 
-def twofactor_loop(uid):
+def twofactor_loop(user):
     tries = 0
     while tries < 3:
-        if twofactor.verify_code(sql.get_2fa_secret(uid)):
+        if twofactor.verify_code(sql.get_2fa_secret(user)):
             return True
         print("Incorrect 2FA Code")
         if tries < 2:
