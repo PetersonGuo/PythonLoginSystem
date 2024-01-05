@@ -3,6 +3,7 @@ import sql
 import bcrypt
 import getpass
 import twofactor
+from user import User
 
 
 def check(username, pw):
@@ -21,7 +22,7 @@ def login():
             if not twofactor_loop(uid):
                 return None
         print("Logged in\n")
-        return uid
+        return User(uid)
     else:
         print("Incorrect Username or Password")
         print("Please try again\n")

@@ -9,9 +9,10 @@ import getpass
 def create_account():
     username = create_username()
     uid = sql.insert(username, create_password(username))
+    session_user = user.User(uid)
     print("\nWould you like to setup 2FA? (y/n)")
     if user.yes_no_input():
-        user.setup_2fa(uid)
+        session_user.setup_2fa()
     print("User created Successfully\n")
 
 
