@@ -1,0 +1,5 @@
+database_host='' # database host url
+database_user='' # database username
+database_pass='' # database password
+database_name='' # database name
+

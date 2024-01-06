@@ -5,3 +5,4 @@ PyMySQL~=1.1.0
 python-dotenv
 pyotp
 pyqrcode
+verify_email

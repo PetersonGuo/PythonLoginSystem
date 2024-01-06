@@ -1,10 +1,12 @@
-import re
-import sys
 import user
 import User
 import sql
+
+import re
+import sys
 import bcrypt
 import getpass
+from verify_email import verify_email
 
 
 def create_account():
@@ -44,20 +46,6 @@ def is_valid_username(str1: str):
         return True
 
 
-def is_valid_email(email: str):
-    if len(email) > 254:
-        print("Email must be less than 254 characters long")
-        return False
-    elif re.search(r'[^A-Za-z0-9@._-]', email):
-        print("Invalid characters in email")
-        return False
-    elif not re.search(r'[^@]+@[^@]+\.[^@]+', email):
-        print("Invalid email")
-        return False
-    else:
-        return True
-
-
 def email_input(str1: str):
     print(str1)
     try:
@@ -65,7 +53,7 @@ def email_input(str1: str):
     except ValueError:
         print("Invalid Input")
         return ""
-    if is_valid_email(email):
+    if verify_email(email):
         return email
     return ""
 
